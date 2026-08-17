@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WeaStyle AI - แนะนำการแต่งกายตามสภาพอากาศ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--primary:#6d4ee7;--primary-deep:#4a2fc9;--primary-soft:#efe9ff;--accent:#c88bff;--text:#261b42;--muted:#6f6787;--panel:#f9f5ff;--line:#ebe1ff;--white:#ffffff;--shadow:0 24px 60px rgba(86,62,164,0.12)}
+    *{box-sizing:border-box}
+    body{font-family:Poppins,Arial,sans-serif;margin:0;background:linear-gradient(180deg,#f4ebff 0%,#f7f1ff 35%,#fff 100%);color:var(--text);min-height:100vh}
+    header{display:flex;align-items:center;justify-content:space-between;padding:22px 32px;background:rgba(255,255,255,0.26);backdrop-filter:blur(12px);border-bottom:1px solid rgba(109,78,231,0.08)}
+    .brand{display:flex;align-items:center;gap:14px}
+    .brand img{width:54px;height:54px;filter:drop-shadow(0 10px 22px rgba(109,78,231,0.22))}
+    .brand h1{margin:0;font-family:'Playfair Display',serif;color:#362b5d;font-size:24px;letter-spacing:0.02em}
+    nav{display:flex;gap:18px}
+    nav button{background:transparent;border:none;padding:10px 16px;border-radius:999px;color:var(--muted);cursor:pointer;transition:all .2s ease;font-weight:600}
+    nav button.active{background:linear-gradient(135deg, rgba(109,78,231,0.12), rgba(200,139,255,0.1));color:var(--primary);box-shadow:0 14px 30px rgba(109,78,231,0.12)}
+
+    main{max-width:1200px;margin:28px auto;padding:18px}
+
+    /* Login hero */
+    .hero{display:flex;gap:28px;align-items:stretch;background:linear-gradient(180deg,#faf5ff 0%, #f3efff 50%);padding:32px;border-radius:24px;box-shadow:var(--shadow);border:1px solid rgba(109,78,231,0.08)}
+    .hero-left{flex:1;padding:10px 18px}
+    .hero-left h2{font-family:'Playfair Display',serif;font-size:42px;margin:6px 0;color:#1f1536}
+    .hero-left p{color:#6b5f86;margin:8px 0 18px}
+    .feature-list{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+    .feature{display:flex;gap:12px;align-items:center}
+    .feature .icon{width:56px;height:56px;border-radius:50%;background:linear-gradient(90deg,#fff,#f7f3ff);display:flex;align-items:center;justify-content:center;border:1px solid #f0e6ff;box-shadow:0 10px 24px rgba(109,78,231,0.08)}
+    .hero-art{margin-top:18px}
+
+    .hero-right{width:420px;display:flex;align-items:center;justify-content:center}
+    .card{background:rgba(255,255,255,0.9);border-radius:24px;padding:28px;width:100%;box-shadow:var(--shadow);border:1px solid rgba(109,78,231,0.08)}
+    .home-hero{display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:32px;background:linear-gradient(135deg, rgba(255,255,255,0.94), rgba(245,241,255,0.92));border-radius:32px;padding:44px;box-shadow:0 38px 80px rgba(97,64,227,0.12);backdrop-filter:blur(12px);border:1px solid rgba(109,78,231,0.08)}
+    .home-text{min-width:320px}
+    .home-text h2{margin-bottom:18px;font-size:44px;line-height:1.05;color:#2b1f4d}
+    .home-text p{color:#5f5375;font-size:17px;line-height:1.9;margin-bottom:28px;max-width:560px}
+    .home-label{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;background:rgba(123,97,255,0.14);color:var(--primary);font-weight:700;font-size:14px;margin-bottom:24px}
+    .home-badges{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:32px}
+    .home-badges span{background:#f9f1ff;color:#6b4cfc;padding:14px 18px;border-radius:18px;font-weight:600;box-shadow:0 20px 50px rgba(123,97,255,0.12)}
+    .hero-cta{width:auto;padding:14px 28px;font-size:16px}
+    .home-image{display:flex;justify-content:center}
+    .home-image .hero-card{width:100%;max-width:520px;padding:24px;background:linear-gradient(180deg,#fff,#f8f2ff);border-radius:28px;box-shadow:0 24px 60px rgba(117,71,255,0.12);display:flex;align-items:center;justify-content:center}
+    .home-slider{width:100%}
+    .home-slider .slides{position:relative;overflow:hidden;border-radius:28px}
+    .home-slider .slide{position:absolute;inset:0;opacity:0;transition:opacity .45s ease;display:flex;align-items:center;justify-content:center}
+    .home-slider .slide.active{opacity:1;position:relative}
+    .home-slider .slide img{width:100%;border-radius:28px;display:block}
+    .home-slider .slider-controls{margin-top:18px;display:flex;align-items:center;justify-content:center;gap:10px}
+    .home-slider .slider-dot{width:12px;height:12px;border-radius:999px;border:none;background:rgba(123,97,255,0.24);cursor:pointer;transition:background .2s}
+    .home-slider .slider-dot.active{background:var(--primary)}
+    .weather-card{display:flex;flex-direction:column;gap:28px}
+    .weather-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap}
+    .weather-top h2{margin:10px 0 12px;color:#2b1f4d;font-size:32px}
+    .weather-top p{max-width:520px;color:#6b5f86;line-height:1.8}
+    .weather-input-box{display:grid;grid-template-columns:220px auto auto;gap:16px;align-items:end;background:linear-gradient(135deg,#f6f1ff,#fdfcff);border:1px solid rgba(109,78,231,0.16);padding:18px;border-radius:24px;box-shadow:0 16px 30px rgba(109,78,231,0.06)}
+    .weather-input-box label{display:flex;flex-direction:column;gap:8px;color:#3c2c63;font-weight:600}
+    .weather-input-box input{padding:12px 14px;border-radius:12px;border:1px solid #e8dfff;background:#fff;font-size:16px;box-shadow:inset 0 1px 2px rgba(109,78,231,0.04)}
+    .weather-input-box button{padding:12px 18px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--primary),#8a6dff);color:#fff;font-weight:700;cursor:pointer;box-shadow:0 16px 36px rgba(109,78,231,0.24)}
+    .weather-result{padding:24px;border-radius:28px;background:linear-gradient(180deg,#fff,#f7f2ff);box-shadow:0 24px 60px rgba(117,71,255,0.08);border:1px solid rgba(109,78,231,0.08)}
+    .weather-result-main{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+    .weather-result-main img{width:100%;max-width:320px;border-radius:22px;box-shadow:0 20px 50px rgba(123,97,255,0.12)}
+    .weather-result-main h3{margin:0 0 12px;color:#412f6a;font-size:28px}
+    .weather-result-main p{margin:0;color:#645777;line-height:1.8}
+    .weather-hints{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}
+    .weather-hints div{background:#fff;border-radius:20px;padding:18px;box-shadow:0 18px 40px rgba(123,97,255,0.08);min-height:110px}
+    .weather-hints strong{display:block;margin-bottom:10px;color:#3c2c63}
+    .weather-hints p{margin:0;color:#776a8f;line-height:1.7}
+    .weather-ai{margin-top:26px;padding:24px;border-radius:28px;background:#f4efff;border:1px solid rgba(123,97,255,0.18)}
+    .weather-ai h4{margin:0 0 14px;color:#3f2e74;font-size:18px}
+    .weather-ai ul{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+    .weather-ai li{background:#fff;padding:14px 16px;border-radius:18px;border:1px solid #e9e2ff;color:#5f5375;box-shadow:0 12px 28px rgba(123,97,255,0.08)}
+    .weather-ai li strong{display:block;color:#382a61;margin-bottom:8px}
+    .weather-items{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:22px}
+    .weather-items div{background:#fff;border-radius:20px;padding:18px;box-shadow:0 18px 35px rgba(123,97,255,0.08)}
+    .weather-items strong{display:block;margin-bottom:10px;color:#382a61}
+    .weather-photo-strip{display:grid;grid-template-columns:repeat(5, minmax(0, 1fr));gap:14px;margin-top:22px}
+    .weather-photo-card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 18px 38px rgba(123,97,255,0.08);border:1px solid #efe7ff;cursor:pointer;transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease}
+    .weather-photo-card:hover{transform:translateY(-2px);box-shadow:0 18px 42px rgba(123,97,255,0.14)}
+    .weather-photo-card.active{border-color:rgba(123,97,255,0.42);box-shadow:0 18px 42px rgba(123,97,255,0.18)}
+    .weather-photo-card img{display:block;width:100%;height:210px;object-fit:cover}
+    .weather-photo-info{padding:10px 12px 14px}
+    .weather-photo-info strong{display:block;margin-bottom:6px;color:#382a61;font-size:12px;letter-spacing:0.02em}
+    .weather-photo-info p{margin:0;color:#665d7c;line-height:1.5;font-size:12px}
+    .ai-question-box{margin-top:22px;padding:22px;border-radius:28px;background:linear-gradient(180deg,#f8f4ff,#fff);border:1px solid rgba(123,97,255,0.15)}
+    .ai-question-box h4{margin:0 0 14px;color:#382a61;font-size:18px}
+    .ai-question-row{display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:14px}
+    .ai-question-row input{padding:12px 14px;border:1px solid #e8e0ff;border-radius:12px;font-size:15px;color:#2f2441}
+    .ai-question-row button{padding:12px 18px;border:none;border-radius:12px;background:linear-gradient(90deg,var(--primary),#9a7cff);color:#fff;font-weight:700;cursor:pointer}
+    .ai-answer-box{display:flex;flex-direction:column;gap:10px}
+    .ai-answer{background:#fff;border-radius:16px;padding:14px 16px;color:#5b4f71;line-height:1.7;border:1px solid #efe7ff}
+    .ai-answer strong{color:#382a61}
+    .fashion-extra{margin-top:24px;padding:22px;border-radius:28px;background:linear-gradient(180deg,#fff,#f8f2ff);border:1px solid rgba(123,97,255,0.15)}
+    .fashion-extra h4{margin:0 0 18px;color:#3f2e74;font-size:18px}
+    .fashion-extra-grid{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:16px}
+    .fashion-extra-item{background:#fff;border:1px solid #ece7ff;border-radius:20px;overflow:hidden;box-shadow:0 16px 36px rgba(123,97,255,0.08);cursor:pointer;transition:transform .2s, box-shadow .2s, border-color .2s;text-align:left}
+    .fashion-extra-item:hover, .fashion-extra-item.active{transform:translateY(-3px);border-color:rgba(123,97,255,0.35);box-shadow:0 18px 42px rgba(123,97,255,0.12)}
+    .fashion-extra-item img{width:100%;height:200px;object-fit:cover;display:block}
+    .fashion-extra-item .info{padding:14px 16px}
+    .fashion-extra-item strong{display:block;color:#382a61;margin-bottom:8px}
+    .fashion-extra-item p{margin:0;color:#665d7c;line-height:1.6;text-align:left}
+    .fashion-detail-mini{margin-top:22px;padding:18px;border-radius:24px;background:#fff;border:1px solid #efe7ff;box-shadow:0 18px 40px rgba(123,97,255,0.08)}
+    .fashion-detail-mini h5{margin:0 0 16px;color:#3f2e74;font-size:18px}
+    .fashion-detail-mini .content{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:center}
+    .fashion-detail-mini img{width:100%;height:280px;object-fit:cover;border-radius:20px;display:block}
+    .fashion-detail-mini .text{color:#665d7c;line-height:1.8}
+    .fashion-wrap{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:22px;margin-top:18px}
+    .fashion-card{background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 20px 50px rgba(123,97,255,0.08);border:1px solid #efe7ff;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;text-align:left}
+    .fashion-card:hover,.fashion-card.active{transform:translateY(-4px);box-shadow:0 22px 60px rgba(123,97,255,0.12);border-color:rgba(123,97,255,0.35)}
+    .fashion-card img{width:100%;height:260px;object-fit:cover;display:block}
+    .fashion-card-body{padding:18px}
+    .fashion-card-body h3{margin:0 0 8px;color:#2b1f4d;font-size:22px}
+    .fashion-card-body p{margin:0 0 12px;color:#665d7c;line-height:1.7;text-align:left}
+    .fashion-tag{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(123,97,255,0.12);color:var(--primary);font-size:12px;font-weight:700}
+    .fashion-detail{margin-top:26px;background:linear-gradient(180deg,#fff,#f7f2ff);border-radius:28px;padding:22px;border:1px solid #efe7ff;box-shadow:0 20px 50px rgba(123,97,255,0.08)}
+    .fashion-detail-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+    .fashion-detail-head h3{margin:0;color:#2b1f4d;font-size:28px}
+    .fashion-detail-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+    .fashion-main-image{width:100%;height:360px;object-fit:cover;border-radius:24px;display:block;box-shadow:0 18px 40px rgba(123,97,255,0.08)}
+    .fashion-mini-grid{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:12px}
+    .fashion-mini-grid img{width:100%;height:110px;object-fit:cover;border-radius:18px;display:block;box-shadow:0 12px 24px rgba(123,97,255,0.08)}
+    .fashion-detail-copy{color:#665d7c;line-height:1.8}
+    @media(max-width:980px){
+      .home-hero{grid-template-columns:1fr;}
+      .home-text h2{font-size:36px}
+      header{padding:18px 20px}
+      .brand h1{font-size:20px}
+      .weather-grid{grid-template-columns:1fr}
+      .weather-hints{grid-template-columns:1fr}
+      .weather-items{grid-template-columns:1fr}
+      .fashion-wrap{grid-template-columns:1fr}
+      .fashion-detail-grid{grid-template-columns:1fr}
+    }
+    .card p{margin:0 0 14px;text-align:center;color:#888}
+    .page{display:none}
+    .page.active{display:block}
+    .field{margin-bottom:12px}
+    .input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #eee}
+    .actions{display:flex;gap:12px;margin-top:12px}
+    .btn-primary{width:100%;padding:12px;border-radius:999px;border:none;background:linear-gradient(90deg,var(--primary),#9b7bff);color:#fff;font-weight:700;cursor:pointer}
+    .social{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+    .social button{padding:10px;border-radius:12px;border:1px solid #eee;background:#fff;cursor:pointer}
+
+    footer{padding:18px;text-align:center;color:#666}
+
+    @media(max-width:980px){.hero{flex-direction:column}.hero-right{width:100%}.brand h1{font-size:18px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="assets/โลโก้.png" alt="WeaStyle logo">
+      <h1>WeaStyle <span style="color:var(--accent)">Style</span></h1>
+    </div>
+    <nav>
+      <button type="button" id="nav-home" onclick="showPage('home', this)">หน้าแรก</button>
+      <button type="button" id="nav-weather" onclick="showPage('weather', this)">สภาพอากาศ</button>
+      <button type="button" id="nav-fashion" onclick="showPage('fashion', this)">เสื้อผ้าแฟชั่น</button>
+      <button type="button" id="nav-login" class="active" onclick="showPage('login', this)">ล็อกอิน</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="login" class="page active">
+      <div class="hero">
+        <div class="hero-left">
+          <h2>ยินดีต้อนรับสู่<br>WeaStyle AI</h2>
+          <p>เว็บไซต์แนะนำการแต่งกายตามสภาพอากาศด้วย AI — แม่นยำ รวดเร็ว สวยงาม</p>
+          <div class="feature-list">
+            <div class="feature"><div class="icon">👚</div><div><strong>แนะนำการแต่งกาย</strong><div style="color:#6b5f86">ตามสภาพอากาศในแต่ละวัน</div></div></div>
+            <div class="feature"><div class="icon">🤖</div><div><strong>AI วิเคราะห์</strong><div style="color:#6b5f86">ให้คำแนะนำแม่นยำและทันสมัย</div></div></div>
+            <div class="feature"><div class="icon">⭐</div><div><strong>แฟชั่นครบ</strong><div style="color:#6b5f86">ไอเท็มและอุปกรณ์เสริม</div></div></div>
+          </div>
+          <div class="hero-art">
+            <img src="assets/hero-clothes.svg" alt="hero" style="width:100%;border-radius:12px">
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="card">
+            <div id="loginPanel">
+              <h3>เข้าสู่ระบบ</h3>
+              <p>เข้าสู่ระบบเพื่อใช้งาน WeaStyle AI</p>
+              <div class="field"><input id="loginName" class="input" type="text" placeholder="กรุณากรอกชื่อของคุณ"></div>
+              <div class="field"><input id="loginPass" class="input" type="password" placeholder="รหัสผ่าน"></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#666;margin-bottom:8px"><label><input id="rememberMe" type="checkbox"> จดจำฉัน</label><a href="#" onclick="event.preventDefault(); alert('ส่งลิงก์รีเซ็ตรหัสผ่าน')">ลืมรหัสผ่าน?</a></div>
+              <button type="button" class="btn-primary" onclick="mockLogin()">เข้าสู่ระบบ</button>
+              <div style="text-align:center;color:#999;margin:12px 0">หรือเข้าสู่ระบบด้วย</div>
+              <div class="social"><button type="button" onclick="alert('เข้าสู่ระบบด้วย Google - mock')">🔎 เข้าสู่ระบบด้วย Google</button><button type="button" onclick="alert('เข้าสู่ระบบด้วย Facebook - mock')">📘 เข้าสู่ระบบด้วย Facebook</button></div>
+              <div style="text-align:center;margin-top:12px;color:#666">ยังไม่มีบัญชี? <a href="#" onclick="event.preventDefault(); showSignupPanel()">สมัครสมาชิก</a></div>
+            </div>
+            <div id="signupPanel" style="display:none">
+              <h3>สมัครสมาชิก</h3>
+              <p>สร้างบัญชีเพื่อรับคำแนะนำส่วนตัวจาก WeaStyle AI</p>
+              <div class="field"><input id="signupName" class="input" type="text" placeholder="ชื่อ-นามสกุล"></div>
+              <div class="field"><input id="signupEmail" class="input" type="email" placeholder="อีเมล"></div>
+              <div class="field"><input id="signupPass" class="input" type="password" placeholder="รหัสผ่าน"></div>
+              <div class="field"><input id="signupPass2" class="input" type="password" placeholder="ยืนยันรหัสผ่าน"></div>
+              <button type="button" class="btn-primary" onclick="mockSignup()">สร้างบัญชี</button>
+              <div style="text-align:center;color:#999;margin:12px 0">หรือ</div>
+              <div style="text-align:center"><button type="button" class="btn" style="background:transparent;color:var(--primary);border:1px solid rgba(123,97,255,0.12)" onclick="showLoginPanel()">กลับไปล็อกอิน</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section id="home" class="page">
+      <div class="home-hero card">
+        <div class="home-text">
+          <div class="home-label">หน้าแรก</div>
+          <h2>เว็บไซต์แนะนำการแต่งกาย<br>ตามสภาพอากาศด้วย AI</h2>
+          <p>WeaStyle AI ช่วยให้คุณเลือกชุดที่เหมาะสมกับสภาพอากาศในแต่ละวันได้อย่างรวดเร็ว ดูดี และไม่ต้องคิดเยอะ พร้อมปรับลุคให้เข้ากับสไตล์ส่วนตัวของคุณ</p>
+          <div class="home-badges"><span>AI แนะนำ</span><span>ลุคเป็นทางการ</span><span>สวยงามทุกสภาพอากาศ</span></div>
+          <button type="button" class="btn-primary hero-cta" onclick="showPage('weather', document.getElementById('nav-weather'))">เริ่มใช้งาน</button>
+        </div>
+        <div class="home-image">
+          <div class="hero-card home-slider">
+            <div class="slides">
+              <div class="slide active"><img src="assets/หน้าร้อน (1).png" alt="ลุคแฟชั่น 1"></div>
+              <div class="slide"><img src="assets/หน้าหนาว.png" alt="ลุคแฟชั่น 2"></div>
+              <div class="slide"><img src="assets/หน้าฝน.png" alt="ลุคแฟชั่น 3"></div>
+            </div>
+            <div class="slider-controls">
+              <button type="button" class="slider-dot active" onclick="showSlide(0)"></button>
+              <button type="button" class="slider-dot" onclick="showSlide(1)"></button>
+              <button type="button" class="slider-dot" onclick="showSlide(2)"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="weather" class="page">
+      <div class="card weather-card">
+        <div class="weather-top">
+          <div>
+            <div class="home-label">สภาพอากาศ</div>
+            <h2>กรอกสภาพอากาศ แล้ว AI จะบอกว่าควรใส่ชุดแบบไหน</h2>
+          </div>
+        </div>
+
+        <div class="weather-input-box" style="grid-template-columns: 1fr auto;">
+          <label>
+            สภาพอากาศ
+            <input id="conditionInput" type="text" value="แดดจัด" placeholder="เช่น แดดจัด / ฝนตก / หนาว">
+          </label>
+          <button type="button" onclick="analyzeWeather()">วิเคราะห์</button>
+        </div>
+
+        <div class="weather-result card">
+          <div class="weather-result-main">
+            <div>
+              <div class="home-label" style="margin-bottom:12px;">AI วิเคราะห์</div>
+              <h3 id="weatherResultTitle">ชุดแนะนำสำหรับคุณ</h3>
+              <p id="weatherResultText">อุณหภูมิวันนี้เหมาะกับชุดที่ให้ความสบายและดูดีที่สุดสำหรับการแต่งกายประจำวัน</p>
+            </div>
+            <img id="weatherResultImg" src="assets/หน้าร้อน.png" alt="แฟชั่นหน้าร้อน">
+          </div>
+          <div class="weather-ai" style="margin-top:18px; margin-bottom:18px; background:#fff;">
+            <h4>คำอธิบายการเลือกชุด</h4>
+            <p id="weatherReasonText" style="margin:0; color:#5f5375; line-height:1.8;">AI จะพิจารณาว่าสภาพอากาศเป็นแบบไหน เช่น แดดจัด ฝนตก หรือหนาว เพื่อเลือกชุดที่เหมาะสมทั้งด้านความสบาย ความคล่องตัว และความสวยงามก่อนแนะนำให้สวมใส่</p>
+          </div>
+          <div class="weather-photo-strip" id="weatherGallery"></div>
+          <div class="weather-ai">
+            <h4>AI แนะนำสำหรับคุณ</h4>
+            <ul id="weatherAiList">
+              <li><strong>WeaStyle AI:</strong> เลือกผ้าที่ระบายอากาศดีและมีสีสว่างเพื่อให้ดูสะดวกและสวยขึ้น</li>
+              <li><strong>WeaStyle AI:</strong> เพิ่มลุคด้วยรองเท้าผ้าใบสีขาวและกระเป๋าเล็กเพื่อความเรียบง่าย</li>
+              <li><strong>WeaStyle AI:</strong> ใส่แว่นกันแดดหรือหมวกปีกกว้างเพื่อให้ลุคดูดีและดูสบายมากขึ้น</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="fashion" class="page">
+      <div class="card">
+        <div class="home-label">เสื้อผ้าแฟชั่น</div>
+        <h2 style="margin:0 0 12px;color:#2b1f4d;font-size:36px">AI วิเคราะห์สภาพอากาศเพื่อแนะนำชุดให้คุณ</h2>
+        <p style="margin:0 0 20px;color:#665d7c;line-height:1.8">กรอกสภาพอากาศ ระบบจะพิจารณาว่า ควรแนะนำ ลุคหน้าร้อน / หน้าฝน / หน้าหนาว</p>
+
+        <div class="weather-input-box" style="margin-bottom:24px; grid-template-columns: 1fr auto;">
+          <label>
+            สภาพอากาศ
+            <input id="fashionConditionInput" type="text" value="แดดจัด" placeholder="เช่น แดดจัด / ฝนตก / หนาว">
+          </label>
+          <button type="button" onclick="analyzeFashion()">วิเคราะห์</button>
+        </div>
+
+        <div class="fashion-wrap" id="fashionWrap"></div>
+
+        <div class="fashion-detail" id="fashionDetail">
+          <div class="fashion-detail-head">
+            <h3 id="fashionDetailTitle">ลุคเย็นสบาย</h3>
+            <span class="fashion-tag" id="fashionDetailTag">Summer</span>
+          </div>
+          <div class="fashion-detail-grid">
+            <div>
+              <img id="fashionMainImage" class="fashion-main-image" src="assets/หน้าร้อน (1).png" alt="ลุคเย็นสบาย">
+            </div>
+            <div class="fashion-detail-copy" id="fashionDetailText">
+              เน้นผ้าระบายอากาศ สีอ่อน และรองเท้าผ้าใบที่สวมใส่สบายตลอดวัน เหมาะกับวันที่อากาศร้อนและต้องการความคล่องตัว
+              <div class="fashion-mini-grid" style="margin-top:16px;">
+                <img src="assets/หน้าร้อน (1).png" alt="ลุคย่อย 1">
+                <img src="assets/หน้าหนาว.png" alt="ลุคย่อย 2">
+                <img src="assets/หน้าฝน.png" alt="ลุคย่อย 3">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tips page removed as requested -->
+
+  </main>
+
+  <footer>© WeaStyle AI</footer>
+
+  <script>
+    const REMEMBER_KEY = 'weastyle-remember-user';
+
+    function getRememberedUser(){
+      try {
+        const saved = localStorage.getItem(REMEMBER_KEY);
+        return saved ? JSON.parse(saved) : null;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function setRememberedUser(name, password){
+      localStorage.setItem(REMEMBER_KEY, JSON.stringify({ name, password }));
+    }
+
+    function clearRememberedUser(){
+      localStorage.removeItem(REMEMBER_KEY);
+    }
+
+    function loadRememberedUser(){
+      const remembered = getRememberedUser();
+      const loginName = document.getElementById('loginName');
+      const loginPass = document.getElementById('loginPass');
+      const rememberMe = document.getElementById('rememberMe');
+
+      if (!remembered) {
+        if (rememberMe) rememberMe.checked = false;
+        return;
+      }
+
+      if (loginName) loginName.value = remembered.name || '';
+      if (loginPass) loginPass.value = remembered.password || '';
+      if (rememberMe) rememberMe.checked = true;
+    }
+
+    function showPage(id, btn){
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      const el = document.getElementById(id);
+      if(el) el.classList.add('active');
+      document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    function mockLogin(){
+      const name = document.getElementById('loginName').value.trim();
+      const password = document.getElementById('loginPass').value.trim();
+      const rememberMe = document.getElementById('rememberMe');
+
+      if(!name){ alert('กรุณากรอกชื่อของคุณ'); return; }
+      if(!password){ alert('กรุณากรอกรหัสผ่าน'); return; }
+
+      if (rememberMe && rememberMe.checked) {
+        setRememberedUser(name, password);
+      } else {
+        clearRememberedUser();
+      }
+
+      showPage('home', document.getElementById('nav-home'));
+      setTimeout(()=>alert('เข้าสู่ระบบสำเร็จ (mock) — ยินดีต้อนรับ, ' + name + '!'),200);
+    }
+
+    function mockSignup(){
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const p1 = document.getElementById('signupPass').value;
+      const p2 = document.getElementById('signupPass2').value;
+      if(!name || !email){ alert('กรุณากรอกชื่อและอีเมล'); return; }
+      if(p1.length < 6){ alert('รหัสผ่านอย่างน้อย 6 ตัวอักษร'); return; }
+      if(p1 !== p2){ alert('รหัสผ่านไม่ตรงกัน'); return; }
+      showPage('home', document.getElementById('nav-home'));
+      alert('สมัครสมาชิกสำเร็จ (mock) — ยินดีต้อนรับ, ' + name + '!');
+    }
+
+    const fashionInfo = {
+      summer: {
+        title: 'ลุคเย็นสบาย',
+        tag: 'Summer',
+        image: 'assets/หน้าที่2/เเฟชั่นหน้าร้อนเพิ่มเติม.jpeg',
+        text: 'เน้นผ้าระบายอากาศ สีอ่อน และรองเท้าผ้าใบที่สวมใส่สบายตลอดวัน เหมาะกับวันที่อากาศร้อนและต้องการความคล่องตัว',
+        gallery: [
+          'assets/หน้าที่2/เเฟชั่นหน้าร้อนเพิ่มเติม.jpeg',
+          'assets/หน้าที่2/เเฟชั่นหน้าร้อนเพิ่มเติม2.jpeg',
+          'assets/หน้าที่2/เเฟชั่นหน้าร้อนเพิ่มเติม3.jpeg',
+          'assets/หน้าที่2/เเฟชั่นหน้าร้อนเพิ่มเติม4.jpeg',
+          'assets/หน้าที่2/เเฟชั่นหน้าร้อนเพิ่มเติม5.jpeg'
+        ]
+      },
+      winter: {
+        title: 'ลุคอบอุ่น',
+        tag: 'Winter',
+        image: 'assets/หน้าที่2/เเฟชั่นหน้าหนาวเพิ่มเติม.jpeg',
+        text: 'ใส่เสื้อโค้ทที่ให้ความอบอุ่น ผ้าพันคอและกางเกงยีนส์สไตล์เรียบแบบคลาสสิก เหมาะกับอากาศเย็นในวันธรรมดา',
+        gallery: [
+          'assets/หน้าที่2/เเฟชั่นหน้าหนาวเพิ่มเติม.jpeg',
+          'assets/หน้าที่2/เเฟชั่นหน้าหนาวเพิ่มเติม2.jpg',
+          'assets/หน้าที่2/เเฟชั่นหน้าหนาวเพิ่มเติม3.jpg',
+          'assets/หน้าที่2/เเฟชั่นหน้าหนาวเพิ่มเติม4.jpeg',
+          'assets/หน้าที่2/เเฟชั่นหน้าหนาวเพิ่มเติม5.jpeg'
+        ]
+      },
+      rainy: {
+        title: 'ลุคกันฝน',
+        tag: 'Rainy',
+        image: 'assets/หน้าที่2/เเฟชั่นหน้าฝนเพิ่มเติม.jpeg',
+        text: 'เลือกแจ็คเก็ตกันฝนสีเข้ม พร้อมกระเป๋ากันน้ำและรองเท้ากันลื่น เพื่อให้ดูดีและพร้อมรับมือกับฝนตกทุกวัน',
+        gallery: [
+          'assets/หน้าที่2/เเฟชั่นหน้าฝนเพิ่มเติม.jpeg',
+          'assets/หน้าที่2/เเฟชั่นหน้าฝนเพิ่มเติม2.jpg',
+          'assets/หน้าที่2/เเฟชั่นหน้าฝนเพิ่มเติม3.jpg',
+          'assets/หน้าที่2/เเฟชั่นหน้าฝนเพิ่มเติม4.jpg',
+          'assets/หน้าที่2/เเฟชั่นหน้าฝนเพิ่มเติม5.jpeg'
+        ]
+      }
+    };
+
+    function renderFashionCards(){
+      const wrap = document.getElementById('fashionWrap');
+      if (!wrap) return;
+
+      const entries = Object.entries(fashionInfo);
+      wrap.innerHTML = entries.map(([key, info]) => `
+        <button type="button" class="fashion-card ${key === 'summer' ? 'active' : ''}" data-fashion="${key}">
+          <img src="${info.image}" alt="${info.title}">
+          <div class="fashion-card-body">
+            <span class="fashion-tag">${info.tag}</span>
+            <h3>${info.title}</h3>
+            <p>${info.text}</p>
+          </div>
+        </button>
+      `).join('');
+
+      wrap.querySelectorAll('.fashion-card').forEach(card => {
+        card.addEventListener('click', function () {
+          selectFashion(this.dataset.fashion);
+        });
+      });
+    }
+
+    function analyzeFashion(){
+      const condition = (document.getElementById('fashionConditionInput').value || '').trim().toLowerCase();
+
+      let type = 'summer';
+      if (condition.includes('ฝน') || condition.includes('rain') || condition.includes('cloud')) type = 'rainy';
+      else if (condition.includes('หนาว') || condition.includes('เย็น') || condition.includes('cold')) type = 'winter';
+      else if (condition.includes('แดด') || condition.includes('sun') || condition.includes('ร้อน')) type = 'summer';
+
+      selectFashion(type);
+    }
+
+    function selectFashion(type){
+      const cards = document.querySelectorAll('.fashion-card');
+      cards.forEach(card => card.classList.toggle('active', card.dataset.fashion === type));
+
+      const info = fashionInfo[type];
+      if (!info) return;
+
+      document.getElementById('fashionDetailTitle').textContent = info.title;
+      document.getElementById('fashionDetailTag').textContent = info.tag;
+      document.getElementById('fashionMainImage').src = info.image;
+      document.getElementById('fashionMainImage').alt = info.title;
+      document.getElementById('fashionDetailText').innerHTML = `${info.text}<div class="fashion-mini-grid" style="margin-top:16px;">${info.gallery.map(src => `<img src="${src}" alt="${info.title}">`).join('')}</div>`;
+    }
+
+    renderFashionCards();
+    selectFashion('summer');
+
+    function showSignupPanel(){
+      document.getElementById('loginPanel').style.display = 'none';
+      document.getElementById('signupPanel').style.display = 'block';
+    }
+
+    function showLoginPanel(){
+      document.getElementById('signupPanel').style.display = 'none';
+      document.getElementById('loginPanel').style.display = 'block';
+    }
+
+    loadRememberedUser();
+
+    const weatherInfo = {
+      sunny: {
+        title: 'หน้าร้อน',
+        text: 'เลือกเสื้อผ้าสบาย ๆ ระบายอากาศได้ดี เช่น เสื้อยืดแขนสั้น กางเกงขาสั้น หรือเดรสผ้าบาง',
+        img: 'assets/หน้าที่2/เเฟชั่นหน้าร้อนเพิ่มเติม.jpeg',
+        items: ['เสื้อยืดคอตตอนสีอ่อน', 'กางเกงขาสั้นลินิน', 'เสื้อเชิ้ตบางโปร่ง', 'หมวกปีกกว้าง', 'รองเท้าสนีกเกอร์สีขาว'],
+        hints: ['ใส่หมวกปีกกว้างหรือแว่นกันแดดเพื่อกันแดด', 'เลือกผ้าคอตตอนหรือผ้าลินินเพื่อความเย็นสบาย', 'พกร่มพับเล็กเพื่อกันแดดหรือฝนได้ทันที'],
+        ai: ['AI แนะนำให้เลือกสีอ่อนเพื่อลดความร้อน', 'เพิ่มลุคด้วยไอเท็มสบาย ๆ เช่นรองเท้าผ้าใบ', 'ใช้กระเป๋าสะพายข้างขนาดเล็กเพื่อความคล่องตัว'],
+        gallery: [
+          'assets/หน้าที่2/เเฟชั่นหน้าร้อนเพิ่มเติม.jpeg',
+          'assets/หน้าที่2/เเฟชั่นหน้าร้อนเพิ่มเติม2.jpeg',
+          'assets/หน้าที่2/เเฟชั่นหน้าร้อนเพิ่มเติม3.jpeg',
+          'assets/หน้าที่2/เเฟชั่นหน้าร้อนเพิ่มเติม4.jpeg',
+          'assets/หน้าที่2/เเฟชั่นหน้าร้อนเพิ่มเติม5.jpeg'
+        ]
+      },
+      rainy: {
+        title: 'หน้าฝน',
+        text: 'เลือกเสื้อผ้าที่แห้งเร็วและไม่อุ้มน้ำ เช่น แจ็คเก็ตลม กางเกงยีนส์หรือสกินนี่พร้อมรองเท้ากันลื่น',
+        img: 'assets/หน้าที่2/เเฟชั่นหน้าฝนเพิ่มเติม.jpeg',
+        items: ['เสื้อกันฝนแบบบาง', 'กางเกงผ้ารีแพล', 'รองเท้ากันลื่น', 'กระเป๋ากันน้ำ', 'หมวกซักรีไลท์'],
+        hints: ['ใส่เสื้อกันฝนหรือแจ็คเก็ตผ้ารีแพล', 'พกร่มและรองเท้ากันลื่น', 'เลือกกระเป๋ากันน้ำเล็กน้อย'],
+        ai: ['AI แนะนำให้ใช้วัสดุกันน้ำแต่ยังหายใจได้', 'เลือกสีเข้มหน่อยเพื่อง่ายต่อการดูแล', 'วางแผนให้มีเลเยอร์ในกรณีฝนตกหนัก'],
+        gallery: [
+          'assets/หน้าที่2/เเฟชั่นหน้าฝนเพิ่มเติม.jpeg',
+          'assets/หน้าที่2/เเฟชั่นหน้าฝนเพิ่มเติม2.jpg',
+          'assets/หน้าที่2/เเฟชั่นหน้าฝนเพิ่มเติม3.jpg',
+          'assets/หน้าที่2/เเฟชั่นหน้าฝนเพิ่มเติม4.jpg',
+          'assets/หน้าที่2/เเฟชั่นหน้าฝนเพิ่มเติม5.jpeg'
+        ]
+      },
+      cool: {
+        title: 'หน้าหนาว',
+        text: 'ใส่เสื้อผ้าอบอุ่นได้แก่ เสื้อโค้ท เสื้อไหมพรม และผ้าพันคอ เพื่อให้ร่างกายอบอุ่นตลอดวัน',
+        img: 'assets/หน้าที่2/เเฟชั่นหน้าหนาวเพิ่มเติม.jpeg',
+        items: ['เสื้อไหมพรมหนา', 'โค้ทขนเป็ด', 'ผ้าพันคอไหมพรม', 'ถุงมือหนัง', 'หมวกบีนนี่'],
+        hints: ['ใส่ผ้าพันคออุ่น ๆ', 'เลือกเสื้อชั้นในแขนยาวและเสื้อโค้ท', 'ใส่ถุงมือหรือหมวกเล็กๆ'],
+        ai: ['AI แนะนำให้เลือกผ้าหนาแต่ไม่อึดอัด', 'ใช้เลเยอร์ให้สามารถปรับอุณหภูมิได้ง่าย', 'เลือกถุงมือที่สัมผัสโทรศัพท์ได้สะดวก'],
+        gallery: [
+          'assets/หน้าที่2/เเฟชั่นหน้าหนาวเพิ่มเติม.jpeg',
+          'assets/หน้าที่2/เเฟชั่นหน้าหนาวเพิ่มเติม2.jpg',
+          'assets/หน้าที่2/เเฟชั่นหน้าหนาวเพิ่มเติม3.jpg',
+          'assets/หน้าที่2/เเฟชั่นหน้าหนาวเพิ่มเติม4.jpeg',
+          'assets/หน้าที่2/เเฟชั่นหน้าหนาวเพิ่มเติม5.jpeg'
+        ]
+      }
+    };
+
+    function analyzeWeather(){
+      const condition = (document.getElementById('conditionInput').value || '').trim().toLowerCase();
+      const normalized = condition
+        .replace(/\s+/g, '')
+        .replace(/\bและ\b/g, '')
+        .replace(/\bมี\b/g, '');
+
+      let type = 'sunny';
+      if (
+        normalized.includes('ฝน') || normalized.includes('rain') ||
+        normalized.includes('cloudy') || normalized.includes('เมฆ') ||
+        normalized.includes('ครึ้ม') || normalized.includes('overcast') ||
+        normalized.includes('m cloudy') || normalized.includes('ฝนโปรย')
+      ) type = 'rainy';
+      else if (
+        normalized.includes('หนาว') || normalized.includes('เย็น') || normalized.includes('cold') ||
+        normalized.includes('ลมหนาว') || normalized.includes('อากาศเย็น')
+      ) type = 'cool';
+      else if (
+        normalized.includes('แดด') || normalized.includes('sun') || normalized.includes('ร้อน') ||
+        normalized.includes('heat') || normalized.includes('อากาศร้อน') || normalized.includes('แสงแดด')
+      ) type = 'sunny';
+
+      selectWeather(type);
+      const recommendationText = {
+        sunny: 'สภาพอากาศ ' + (condition || 'แดดจัด') + ' ควรเลือกชุดที่ระบายอากาศดี สีสว่าง และสวมใส่สบายที่สุด',
+        rainy: 'สภาพอากาศ ' + (condition || 'ฝนตก') + ' ควรเลือกชุดที่แห้งเร็ว ดูเรียบ และพร้อมรับมือกับฝน',
+        cool: 'สภาพอากาศ ' + (condition || 'หนาว') + ' ควรเลือกชุดที่อบอุ่น ดูดี และให้ความสบายในอากาศเย็น'
+      };
+      const reasonText = {
+        sunny: 'เมื่อสภาพอากาศเป็นแดดจัดหรือร้อนมาก AI จะเลือกชุดที่ระบายอากาศได้ดี เช่น ผ้าบาง สีอ่อน และรองเท้าที่สบาย ไม่อึดอัด เพื่อให้ร่างกายรู้สึกเย็นและไม่เหนื่อยง่าย',
+        rainy: 'เมื่อสภาพอากาศเป็นฝนตกหรือฟ้าครึ้ม AI จะเลือกชุดที่มีความกันน้ำและแห้งเร็ว เช่น แจ็คเก็ตกันฝน กางเกงที่ดูเรียบ และรองเท้าที่ไม่ลื่น เพื่อให้สวมใส่สบายและพร้อมรับมือกับฝน',
+        cool: 'เมื่อสภาพอากาศเป็นหนาวหรือเย็น AI จะเลือกชุดที่ให้ความอบอุ่น เช่น เสื้อโค้ท ผ้าพันคอ และผ้าหนา เพื่อรักษาอุณหภูมิร่างกายและยังคงดูดีในวันเย็น'
+      };
+
+      document.getElementById('weatherResultTitle').textContent = 'ชุดแนะนำสำหรับคุณ';
+      document.getElementById('weatherResultText').textContent = recommendationText[type];
+      document.getElementById('weatherReasonText').textContent = reasonText[type];
+
+      const tempBasedItems = {
+        sunny: {
+          top: 'เสื้อยืดคอตตอนสีอ่อน',
+          bottom: 'กางเกงขาสั้นลินิน',
+          outer: 'เสื้อเชิ้ตบางโปร่ง',
+          accessory: 'กระเป๋าผ้าหรือหมวกปีกกว้าง'
+        },
+        rainy: {
+          top: 'เสื้อกันฝนหรือเสื้อผ้าบางที่ยืดหยุ่น',
+          bottom: 'กางเกงยีนส์หรือกางเกงผ้ารัดกุม',
+          outer: 'แจ็คเก็ตกันฝนหรือเสื้อคลุมเบา',
+          accessory: 'ร่มและกระเป๋ากันน้ำ'
+        },
+        cool: {
+          top: 'เสื้อเชิ้ตแขนยาวหรือเสื้อผ้าหนา',
+          bottom: 'กางเกงขายาวหรือยีนส์',
+          outer: 'เสื้อโค้ทหรือแจ็คเก็ตหนา',
+          accessory: 'ผ้าพันคอและถุงมือเล็ก ๆ'
+        }
+      };
+
+      const itemList = tempBasedItems[type];
+      const fields = document.querySelectorAll('#weatherItemList div p');
+      fields[0].textContent = itemList.top;
+      fields[1].textContent = itemList.bottom;
+      fields[2].textContent = itemList.outer;
+      fields[3].textContent = itemList.accessory;
+    }
+
+    function selectWeather(type){
+      const options = document.querySelectorAll('.weather-option');
+      options.forEach(option => option.classList.toggle('active', option.textContent.includes(weatherInfo[type].title)));
+      document.getElementById('weatherResultImg').src = weatherInfo[type].img;
+      const hints = document.querySelectorAll('.weather-hints div p');
+      hints.forEach((hint, index) => hint.textContent = weatherInfo[type].hints[index]);
+
+      const gallery = document.getElementById('weatherGallery');
+      const galleryItems = weatherInfo[type].gallery || [];
+      const captions = {
+        sunny: [
+          'เสื้อยืดสีอ่อน ทำให้ระบายอากาศดี เหมาะกับวันที่แดดจัดและร้อนมาก',
+          'กางเกงลินิน ใส่สบาย ไม่อึดอัด เหมาะกับอากาศร้อนและต้องการความคล่องตัว',
+          'ลุคสบาย เลือกสีอ่อนและผ้าบาง ช่วยลดอุณหภูมิบนร่างกายได้ดี',
+          'รองเท้าผ้าใบ เหมาะกับวันที่เดินกลางแดดและต้องการความสบายแบบไม่หนัก',
+          'กระเป๋าเล็ก เพิ่มความเรียบง่ายและสวยงาม เหมาะกับลุคกลางวันแบบไม่ปวดหัว'
+        ],
+        rainy: [
+          'แจ็คเก็ตกันฝน ปกป้องจากฝนและยังดูทันสมัย เหมาะกับสภาพอากาศเปียกชื้น',
+          'กางเกงยีนส์ ดูเรียบ ทนทาน และเหมาะกับวันที่มีฝนตกบ้างหรือมีความชื้นสูง',
+          'รองเท้ากันลื่น ช่วยให้เดินปลอดภัยบนพื้นเปียกและลดความเสี่ยงลื่น',
+          'เสื้อกันฝน ให้ความคุ้มครองจากฝนและคงความสบายเวลาอยู่กลางแจ้ง',
+          'ชุดเดินฝน ผสมผสานความเรียบพร้อมใช้งาน เหมาะกับวันที่ฝนตกต่อเนื่อง'
+        ],
+        cool: [
+          'เสื้อโค้ท ให้ความอบอุ่นและดูสง่า เหมาะกับวันที่อากาศเย็นและต้องการความสบาย',
+          'ผ้าพันคอช่วยรักษาความอบอุ่นให้ลำคอ เหมาะกับเสื้อผ้าที่เย็นหรือมีลมพัด',
+          'ลุคอบอุ่น ใช้ผ้าหนาและสีเข้ม ช่วยอุ่นร่างกายและยังดูดีในวันหนาว',
+          'ชุดวันเย็น ผสมสีอบอุ่นและชั้นผ้าได้อย่างลงตัว เหมาะกับอากาศเย็นแบบไม่หนาวจัด',
+          'สไตล์อบอุ่น เน้นความนุ่มและหยุ่น เหมาะกับวันที่อากาศเย็นแต่ยังต้องการลุคดูดี'
+        ]
+      };
+      if (gallery) {
+        gallery.innerHTML = galleryItems.map((src, index) => `
+          <div class="weather-photo-card" data-image="${src}" data-caption="${captions[type][index] || 'ลุคแนะนำ'}" tabindex="0" role="button" aria-label="เลือกชุด ${captions[type][index] || 'ลุคแนะนำ'}">
+            <img src="${src}" alt="outfit-${index + 1}">
+            <div class="weather-photo-info">
+              <strong>${weatherInfo[type].title}</strong>
+              <p>${captions[type][index] || 'ลุคแนะนำ'}</p>
+            </div>
+          </div>
+        `).join('');
+
+        gallery.querySelectorAll('.weather-photo-card').forEach((card, index) => {
+          card.addEventListener('click', () => {
+            gallery.querySelectorAll('.weather-photo-card').forEach(item => item.classList.remove('active'));
+            card.classList.add('active');
+            const selectedImg = card.getAttribute('data-image');
+            if (selectedImg) {
+              document.getElementById('weatherResultImg').src = selectedImg;
+            }
+          });
+
+          card.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              card.click();
+            }
+          });
+        });
+
+        const firstCard = gallery.querySelector('.weather-photo-card');
+        if (firstCard) {
+          firstCard.classList.add('active');
+        }
+      }
+
+      const aiList = document.querySelectorAll('#weatherAiList li');
+      aiList.forEach((li, index) => {
+        li.innerHTML = '<strong>WeaStyle AI:</strong> ' + weatherInfo[type].ai[index];
+      });
+    }
+
+    let slideIndex = 0;
+    function showSlide(index){
+      const slides = document.querySelectorAll('.home-slider .slide');
+      const dots = document.querySelectorAll('.home-slider .slider-dot');
+      if(!slides.length) return;
+      if(index < 0) index = slides.length - 1;
+      if(index >= slides.length) index = 0;
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+      dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+      slideIndex = index;
+    }
+
+    function nextHomeSlide(){
+      showSlide(slideIndex + 1);
+    }
+
+    setInterval(nextHomeSlide, 5000);
+  </script>
+</body>
+</html>
